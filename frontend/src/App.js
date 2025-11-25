@@ -5,6 +5,8 @@ import ChatPage from './pages/ChatPage';
 import UploadPage from './pages/UploadPage';
 import GamesPage from './pages/GamesPage';
 import GameDetailPage from './pages/GameDetailPage';
+import AdminGamesPage from './pages/AdminGamesPage';
+import { CyberToastContainer } from './components/CyberToast';
 import { isAuthenticated } from './utils/auth';
 
 // 受保护的路由组件
@@ -15,6 +17,7 @@ function ProtectedRoute({ children }) {
 function App() {
   return (
     <Router>
+      <CyberToastContainer />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
@@ -47,6 +50,15 @@ function App() {
           element={
             <ProtectedRoute>
               <GameDetailPage />
+            </ProtectedRoute>
+          } 
+        />
+        {/* 管理员页面 - 仅 localhost 可访问 */}
+        <Route 
+          path="/admin/games" 
+          element={
+            <ProtectedRoute>
+              <AdminGamesPage />
             </ProtectedRoute>
           } 
         />

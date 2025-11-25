@@ -1,0 +1,92 @@
+/* Language Switcher - 语言切换下拉菜单 */
+
+.lang-switcher-container {
+  position: relative;
+  margin-left: 16px; /* 与上传按钮保持间距 */
+}
+
+.lang-switcher {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.lang-switcher:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.lang-switcher .chevron {
+  transition: transform 0.2s ease;
+  opacity: 0.5;
+  margin-left: 2px;
+}
+
+.lang-switcher .chevron.open {
+  transform: rotate(180deg);
+}
+
+.lang-switcher svg:first-child {
+  opacity: 0.6;
+}
+
+/* 下拉菜单 */
+.lang-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 90px;
+  background: rgba(20, 20, 20, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 3px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  animation: dropdownFadeIn 0.15s ease;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lang-option {
+  padding: 6px 10px;
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1.2;
+}
+
+.lang-option:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.lang-option.active {
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 500;
+}
+
+.lang-option.active::before {
+  content: '✓';
+  margin-right: 6px;
+  font-size: 11px;
+}

@@ -1,8 +1,9 @@
 """
 对话历史路由
 """
+import json
 from flask import Blueprint, request, jsonify
-from database.models import User, ChatHistory, SessionLocal
+from database.models import User, ChatHistory, Game, SessionLocal
 
 bp = Blueprint('chat_history', __name__, url_prefix='/api/chat/history')
 
@@ -23,9 +24,27 @@ def get_history(user_key):
                 .order_by(ChatHistory.created_at.asc())\
                 .all()
             
+            # 构建返回数据，包含关联的游戏信息
+            result = []
+            for h in histories:
+                history_dict = h.to_dict()
+                
+                # 如果有关联的游戏 ID，查询游戏信息
+                if h.game_ids:
+                    try:
+                        game_ids = json.loads(h.game_ids)
+                        games = db.query(Game).filter(Game.id.in_(game_ids)).all()
+                        history_dict['games'] = [g.to_dict() for g in games]
+                    except:
+                        history_dict['games'] = []
+                else:
+                    history_dict['games'] = []
+                
+                result.append(history_dict)
+            
             return jsonify({
                 'success': True,
-                'histories': [h.to_dict() for h in histories]
+                'histories': result
             }), 200
         finally:
             db.close()

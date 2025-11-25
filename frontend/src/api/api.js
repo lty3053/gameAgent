@@ -232,4 +232,15 @@ export const uploadVideo = async (file, onProgress) => {
   return response.data;
 };
 
+// 获取 OSS 签名 URL
+export const getSignedUrl = async (url) => {
+  try {
+    const response = await api.post('/upload/sign-url', { url });
+    return response.data.signed_url;
+  } catch (error) {
+    console.error('Failed to get signed URL:', error);
+    return null;
+  }
+};
+
 export default api;

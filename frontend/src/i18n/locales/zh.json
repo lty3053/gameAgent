@@ -1,0 +1,176 @@
+{
+  "header": {
+    "clear": "清空",
+    "uploadGame": "上传游戏"
+  },
+  "chat": {
+    "welcomeTitle": "有什么可以帮你的？",
+    "welcomeSubtitle": "我是你的私人游戏助手。可以为你推荐游戏、搜索游戏或管理游戏库。",
+    "inputPlaceholder": "问我任何关于游戏的问题...",
+    "suggestions": {
+      "action": {
+        "text": "推荐一款动作游戏",
+        "desc": "快节奏、激烈战斗"
+      },
+      "rpg": {
+        "text": "有什么新的RPG吗？",
+        "desc": "剧情丰富的冒险"
+      },
+      "upload": {
+        "text": "如何上传游戏？",
+        "desc": "了解上传流程"
+      },
+      "capabilities": {
+        "text": "你能做什么？",
+        "desc": "探索AI能力"
+      }
+    },
+    "historyCleared": "对话历史已清空",
+    "clearFailed": "清空失败",
+    "status": {
+      "analyzing": "正在分析你的请求...",
+      "searching": "正在搜索游戏库..."
+    }
+  },
+  "login": {
+    "title": "欢迎回来",
+    "subtitle": "登录以继续你的游戏之旅",
+    "guestBtn": "游客访问",
+    "guestDesc": "快速访问，无需注册",
+    "loginBtn": "登录",
+    "registerBtn": "注册账号",
+    "emailPlaceholder": "邮箱",
+    "passwordPlaceholder": "密码",
+    "backToChoice": "返回",
+    "loginSuccess": "登录成功！",
+    "loginFailed": "登录失败，请检查邮箱和密码",
+    "registerSuccess": "注册成功！",
+    "registerFailed": "注册失败",
+    "guestFailed": "游客登录失败，请重试",
+    "fillRequired": "请输入邮箱和密码",
+    "passwordMinLength": "密码至少需要6个字符",
+    "noAccount": "没有账号？立即注册",
+    "hasAccount": "已有账号？立即登录"
+  },
+  "upload": {
+    "title": "上传游戏",
+    "sectionLabel": "游戏信息",
+    "tabs": {
+      "file": "文件上传",
+      "netdisk": "网盘链接"
+    },
+    "dropzone": {
+      "title": "将游戏文件拖放到这里",
+      "subtitle": "或点击浏览文件",
+      "formats": "支持 ZIP、RAR、7Z、ISO 格式"
+    },
+    "netdisk": {
+      "title": "云端资源",
+      "subtitle": "直接保存分享链接，无需重新上传。支持夸克、百度、阿里云盘。"
+    },
+    "form": {
+      "gameName": "游戏名称",
+      "gameNameEn": "英文名称（可选）",
+      "gameNameRequired": "游戏名称不能为空",
+      "category": "选择游戏类型",
+      "shareLink": "分享链接（永久有效，无提取码）",
+      "shareLinkRequired": "链接不能为空",
+      "totalSize": "文件大小（如 15GB）",
+      "coverImage": "封面图片（可选）",
+      "description": "游戏描述...",
+      "submit": "上传",
+      "submitting": "上传中..."
+    },
+    "categories": {
+      "action": "动作冒险",
+      "turn_based": "回合战棋",
+      "wuxia": "国风仙侠",
+      "retro": "复古经典",
+      "female_lead": "女性主角",
+      "utility": "实用工具",
+      "horror": "恐怖惊悚",
+      "shooter": "枪战射击",
+      "fighting": "格斗对战",
+      "simulation": "模拟经营",
+      "puzzle": "益智休闲",
+      "interactive": "真人互动",
+      "racing": "竞速体育",
+      "strategy": "策略战略",
+      "roguelike": "肉鸽游戏",
+      "vr": "虚拟现实（VR）",
+      "visual_novel": "视觉小说",
+      "rpg": "角色扮演"
+    },
+    "netdiskTypes": {
+      "quark": "夸克网盘",
+      "xunlei": "迅雷网盘",
+      "baidu": "百度网盘",
+      "aliyun": "阿里云盘"
+    },
+    "messages": {
+      "selectFile": "请先选择文件",
+      "uploadSuccess": "上传成功！",
+      "uploadFailed": "上传失败"
+    },
+    "progress": {
+      "uploading": "上传中",
+      "processing": "处理中...",
+      "complete": "完成！"
+    }
+  },
+  "games": {
+    "title": "游戏库",
+    "search": "搜索游戏...",
+    "searchBtn": "搜索",
+    "back": "返回",
+    "empty": {
+      "title": "暂无游戏",
+      "subtitle": "还没有上传任何游戏，快去上传吧！",
+      "uploadBtn": "上传游戏"
+    },
+    "loadFailed": "加载游戏列表失败",
+    "searchFailed": "搜索失败"
+  },
+  "gameDetail": {
+    "back": "返回游戏库",
+    "download": "下载游戏",
+    "getLink": "获取链接",
+    "notFound": "游戏不存在",
+    "backToLibrary": "返回游戏库",
+    "loadFailed": "加载游戏详情失败",
+    "downloadStarted": "开始下载...",
+    "downloadFailed": "下载失败",
+    "info": {
+      "name": "名称",
+      "description": "描述",
+      "fileSize": "文件大小",
+      "storageType": "存储类型",
+      "uploadTime": "上传时间",
+      "noDescription": "暂无描述"
+    },
+    "storageTypes": {
+      "oss": "云存储",
+      "netdisk": "网盘"
+    }
+  },
+  "gameCard": {
+    "download": "下载",
+    "getLink": "获取链接",
+    "noDescription": "暂无描述",
+    "netdiskTypes": {
+      "quark": "夸克网盘",
+      "baidu": "百度网盘",
+      "aliyun": "阿里云盘"
+    }
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "cancel": "取消",
+    "confirm": "确认",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑"
+  }
+}

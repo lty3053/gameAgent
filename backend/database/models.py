@@ -84,6 +84,7 @@ class ChatHistory(Base):
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True)
     role = Column(String(20), nullable=False)  # 'user' or 'assistant'
     content = Column(Text, nullable=False)
+    game_ids = Column(Text, nullable=True)  # JSON 格式存储关联的游戏 ID，如 "[1, 2, 3]"
     created_at = Column(DateTime, default=datetime.utcnow)
     
     # 关系
@@ -95,6 +96,7 @@ class ChatHistory(Base):
             'user_id': self.user_id,
             'role': self.role,
             'content': self.content,
+            'game_ids': self.game_ids,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 

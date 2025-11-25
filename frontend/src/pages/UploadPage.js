@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Layout, Upload, Form, Input, message, Select, Row, Col } from 'antd';
+import { Layout, Upload, Form, Input, Select, Row, Col } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { 
   UploadCloud, 
   Link as LinkIcon, 
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { uploadFile, getUploadProgress, uploadNetdisk } from '../api/api';
+import { cyberToast } from '../components/CyberToast';
 import './UploadPage.css';
 
 const { Header, Content } = Layout;
@@ -21,6 +23,7 @@ const { Dragger } = Upload;
 const { TextArea } = Input;
 
 function UploadPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [uploadMode, setUploadMode] = useState('s3'); // 's3' or 'netdisk'
@@ -44,11 +47,11 @@ function UploadPage() {
         
         if (data.status === 'completed' || data.percent === 100) {
           clearInterval(pollTimer.current);
-          message.success('Success!');
-          setTimeout(() => navigate('/chat'), 1000);
+          cyberToast.success(t('upload.messages.uploadSuccess'));
+          setTimeout(() => navigate('/chat'), 1500);
         } else if (data.status === 'error') {
           clearInterval(pollTimer.current);
-          message.error(data.error || 'Error occurred');
+          cyberToast.error(data.error || t('upload.messages.uploadFailed'));
           setUploading(false);
         }
       }
@@ -74,12 +77,12 @@ function UploadPage() {
 
   const handleSubmit = async (values) => {
     if (uploadMode === 's3' && !file) {
-      message.error('Please select a file first');
+      cyberToast.error(t('upload.messages.selectFile'));
       return;
     }
 
     if (uploadMode === 'netdisk' && !values.netdisk_url) {
-      message.error('Link is required');
+      cyberToast.error(t('upload.form.shareLinkRequired'));
       return;
     }
 
@@ -100,6 +103,8 @@ function UploadPage() {
         await uploadNetdisk(
           {
             name: values.name,
+            name_en: values.name_en,
+            category: values.category,
             description: values.description,
             netdisk_url: values.netdisk_url,
             netdisk_type: values.netdisk_type || 'quark',
@@ -111,7 +116,7 @@ function UploadPage() {
       }
     } catch (error) {
       console.error('Upload error:', error);
-      message.error(error.message || 'Upload failed');
+      cyberToast.error(error.message || t('upload.messages.uploadFailed'));
       setUploading(false);
       if (pollTimer.current) clearInterval(pollTimer.current);
     }
@@ -123,9 +128,9 @@ function UploadPage() {
         <div className="header-content">
           <button onClick={() => navigate('/chat')} className="back-btn">
             <ArrowLeft size={20} />
-            <span>BACK</span>
+            <span>{t('games.back')}</span>
           </button>
-          <h1 className="header-title">UPLOAD GAME</h1>
+          <h1 className="header-title">{t('upload.title').toUpperCase()}</h1>
           <div style={{ width: 80 }}></div>
         </div>
       </Header>
@@ -146,14 +151,14 @@ function UploadPage() {
                 onClick={() => setUploadMode('s3')}
               >
                 <HardDrive size={18} />
-                <span>S3 DIRECT</span>
+                <span>{t('upload.tabs.file').toUpperCase()}</span>
               </div>
               <div 
                 className={`mode-switch-btn ${uploadMode === 'netdisk' ? 'active' : ''}`}
                 onClick={() => setUploadMode('netdisk')}
               >
                 <LinkIcon size={18} />
-                <span>NETDISK LINK</span>
+                <span>{t('upload.tabs.netdisk').toUpperCase()}</span>
               </div>
             </div>
 
@@ -177,8 +182,8 @@ function UploadPage() {
                   >
                     <div className="upload-placeholder">
                       <UploadCloud className="upload-icon-large" />
-                      <div className="upload-text-main">DRAG & DROP</div>
-                      <div className="upload-text-sub">or click to browse</div>
+                      <div className="upload-text-main">{t('upload.dropzone.title')}</div>
+                      <div className="upload-text-sub">{t('upload.dropzone.subtitle')}</div>
                     </div>
                   </Dragger>
                   
@@ -205,9 +210,9 @@ function UploadPage() {
                     <div className="netdisk-glow-icon">
                       <Cloud className="netdisk-icon-inner" size={48} color="#ff4d4f" />
                     </div>
-                    <h3 style={{ fontSize: '24px', marginBottom: '16px', color: 'white' }}>Cloud Resource</h3>
+                    <h3 style={{ fontSize: '24px', marginBottom: '16px', color: 'white' }}>{t('upload.netdisk.title')}</h3>
                     <p style={{ color: 'rgba(255,255,255,0.5)', maxWidth: '300px' }}>
-                      Save shared links directly without re-uploading. Supports Quark, Baidu, and Aliyun Drive.
+                      {t('upload.netdisk.subtitle')}
                     </p>
                   </div>
                 </motion.div>
@@ -217,7 +222,7 @@ function UploadPage() {
 
           {/* Right Panel: Form */}
           <div className="upload-right-panel">
-            <span className="section-label">Game Metadata</span>
+            <span className="section-label">{t('upload.sectionLabel')}</span>
             
             <Form
               form={form}
@@ -225,11 +230,57 @@ function UploadPage() {
               onFinish={handleSubmit}
               disabled={uploading}
             >
+              <Form.Item
+                name="name"
+                rules={[{ required: true, message: t('upload.form.gameNameRequired') }]}
+              >
+                <Input className="minimal-input" placeholder={t('upload.form.gameName')} autoComplete="off" />
+              </Form.Item>
+
+              <Form.Item name="name_en">
+                <Input className="minimal-input" placeholder={t('upload.form.gameNameEn')} autoComplete="off" />
+              </Form.Item>
+
+              <Form.Item name="category">
+                <Select 
+                  className="minimal-select"
+                  placeholder={t('upload.form.category')}
+                  dropdownStyle={{ background: '#1a1a1a', border: '1px solid #333' }}
+                  allowClear
+                >
+                  <Select.Option value="action">{t('upload.categories.action')}</Select.Option>
+                  <Select.Option value="turn_based">{t('upload.categories.turn_based')}</Select.Option>
+                  <Select.Option value="wuxia">{t('upload.categories.wuxia')}</Select.Option>
+                  <Select.Option value="retro">{t('upload.categories.retro')}</Select.Option>
+                  <Select.Option value="female_lead">{t('upload.categories.female_lead')}</Select.Option>
+                  <Select.Option value="utility">{t('upload.categories.utility')}</Select.Option>
+                  <Select.Option value="horror">{t('upload.categories.horror')}</Select.Option>
+                  <Select.Option value="shooter">{t('upload.categories.shooter')}</Select.Option>
+                  <Select.Option value="fighting">{t('upload.categories.fighting')}</Select.Option>
+                  <Select.Option value="simulation">{t('upload.categories.simulation')}</Select.Option>
+                  <Select.Option value="puzzle">{t('upload.categories.puzzle')}</Select.Option>
+                  <Select.Option value="interactive">{t('upload.categories.interactive')}</Select.Option>
+                  <Select.Option value="racing">{t('upload.categories.racing')}</Select.Option>
+                  <Select.Option value="strategy">{t('upload.categories.strategy')}</Select.Option>
+                  <Select.Option value="roguelike">{t('upload.categories.roguelike')}</Select.Option>
+                  <Select.Option value="vr">{t('upload.categories.vr')}</Select.Option>
+                  <Select.Option value="visual_novel">{t('upload.categories.visual_novel')}</Select.Option>
+                  <Select.Option value="rpg">{t('upload.categories.rpg')}</Select.Option>
+                </Select>
+              </Form.Item>
+
               {uploadMode === 'netdisk' && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                 >
+                  <Form.Item
+                    name="netdisk_url"
+                    rules={[{ required: true, message: t('upload.form.shareLinkRequired') }]}
+                  >
+                    <Input className="minimal-input" placeholder={t('upload.form.shareLink')} autoComplete="off" />
+                  </Form.Item>
+
                   <Row gutter={16}>
                     <Col span={12}>
                       <Form.Item name="netdisk_type" initialValue="quark">
@@ -237,34 +288,21 @@ function UploadPage() {
                           className="minimal-select"
                           dropdownStyle={{ background: '#1a1a1a', border: '1px solid #333' }}
                         >
-                          <Select.Option value="quark">Quark Drive</Select.Option>
-                          <Select.Option value="baidu">Baidu Netdisk</Select.Option>
-                          <Select.Option value="aliyun">Aliyun Drive</Select.Option>
+                          <Select.Option value="quark">{t('upload.netdiskTypes.quark')}</Select.Option>
+                          <Select.Option value="xunlei">{t('upload.netdiskTypes.xunlei')}</Select.Option>
+                          <Select.Option value="baidu">{t('upload.netdiskTypes.baidu')}</Select.Option>
+                          <Select.Option value="aliyun">{t('upload.netdiskTypes.aliyun')}</Select.Option>
                         </Select>
                       </Form.Item>
                     </Col>
                     <Col span={12}>
                        <Form.Item name="file_size">
-                        <Input className="minimal-input" placeholder="Total Size (e.g. 15GB)" autoComplete="off" />
+                        <Input className="minimal-input" placeholder={t('upload.form.totalSize')} autoComplete="off" />
                       </Form.Item>
                     </Col>
                   </Row>
-
-                  <Form.Item
-                    name="netdisk_url"
-                    rules={[{ required: true, message: 'Link is required' }]}
-                  >
-                    <Input className="minimal-input" placeholder="Share Link (Permanent, No Code)" autoComplete="off" />
-                  </Form.Item>
                 </motion.div>
               )}
-
-              <Form.Item
-                name="name"
-                rules={[{ required: true, message: 'Game Name is required' }]}
-              >
-                <Input className="minimal-input" placeholder="Game Name" autoComplete="off" />
-              </Form.Item>
 
               <Form.Item name="cover" style={{ marginTop: '24px' }}>
                 <Upload
@@ -277,7 +315,7 @@ function UploadPage() {
                   {!coverImage && (
                     <div style={{ color: 'rgba(255,255,255,0.6)' }}>
                       <UploadCloud size={32} style={{ marginBottom: '8px' }} />
-                      <div>Cover Image (Optional)</div>
+                      <div>{t('upload.form.coverImage')}</div>
                     </div>
                   )}
                 </Upload>
@@ -287,7 +325,7 @@ function UploadPage() {
                 <TextArea
                   rows={6}
                   className="minimal-textarea"
-                  placeholder="Description..."
+                  placeholder={t('upload.form.description')}
                   autoComplete="off"
                 />
               </Form.Item>
@@ -303,7 +341,7 @@ function UploadPage() {
                   ) : (
                     <Save size={20} />
                   )}
-                  <span>{uploading ? 'PROCESSING...' : 'SAVE GAME'}</span>
+                  <span>{uploading ? t('upload.form.submitting').toUpperCase() : t('upload.form.submit').toUpperCase()}</span>
                 </button>
               </div>
             </Form>
@@ -322,10 +360,10 @@ function UploadPage() {
               {uploadProgress}%
             </div>
             <div className="progress-status">
-              {uploadProgress === 100 ? 'FINALIZING...' : 'UPLOADING...'}
+              {uploadProgress === 100 ? t('upload.progress.processing') : t('upload.progress.uploading') + '...'}
             </div>
             <div style={{ marginTop: '16px', color: 'rgba(255,255,255,0.3)' }}>
-               {file?.name || 'Processing Request'}
+               {file?.name || t('upload.progress.processing')}
             </div>
           </motion.div>
         </div>

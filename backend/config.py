@@ -13,15 +13,21 @@ class Config:
     
     DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
     
-    # Tebi.io S3 Configuration
-    S3_ENDPOINT = os.getenv('S3_ENDPOINT', 'https://s3.tebi.io')
-    S3_ACCESS_KEY = os.getenv('S3_ACCESS_KEY', '0CWhNqI9sqxT8dh6')
-    S3_SECRET_KEY = os.getenv('S3_SECRET_KEY', '88iUjwzMmTPIZWP4z9GLgE2k3YK19S8xYUtc0hUK')
-    S3_BUCKET = os.getenv('S3_BUCKET', 'ltygames')
-    S3_CUSTOM_DOMAIN = os.getenv('S3_CUSTOM_DOMAIN', 'https://ltygames.88mac.cn')  # 自定义域名用于访问
+    # 阿里云 OSS Configuration
+    OSS_ENDPOINT = os.getenv('OSS_ENDPOINT', 'https://oss-cn-hangzhou.aliyuncs.com')
+    OSS_ACCESS_KEY_ID = os.getenv('OSS_ACCESS_KEY_ID', '')
+    OSS_ACCESS_KEY_SECRET = os.getenv('OSS_ACCESS_KEY_SECRET', '')
+    OSS_BUCKET = os.getenv('OSS_BUCKET', 'hyperhit-video-dev')
+    OSS_BASE_PATH = os.getenv('OSS_BASE_PATH', 'test')  # 存储根目录
+    
+    # OSS 公网访问域名
+    @staticmethod
+    def get_oss_public_url(key):
+        """生成 OSS 公网访问 URL"""
+        return f"https://{Config.OSS_BUCKET}.oss-cn-hangzhou.aliyuncs.com/{key}"
     
     # AI Model Configuration
-    QWEN_API_KEY = os.getenv('QWEN_API_KEY', 'sk-6c61ee051fa54352947add304b957a49')
+    QWEN_API_KEY = os.getenv('QWEN_API_KEY', '')
     QWEN_MODEL = os.getenv('QWEN_MODEL', 'qwen3-max')
     QWEN_BASE_URL = os.getenv('QWEN_BASE_URL', 'https://dashscope.aliyuncs.com/compatible-mode/v1')
     

@@ -1,29 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Button, Tag, Descriptions, message, Spin, Card } from 'antd';
-import { ArrowLeftOutlined, DownloadOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { Layout, Button, Tag, Descriptions, message, Card } from 'antd';
+import { ArrowLeftOutlined, DownloadOutlined, ClockCircleOutlined, LoadingOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getGameById } from '../api/api';
+import { getGameById, getSignedUrl } from '../api/api';
+import CyberLoader from '../components/CyberLoader';
 import './GameDetailPage.css';
 
 const { Header, Content } = Layout;
 
 function GameDetailPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams();
   const [game, setGame] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     const loadGameDetail = async () => {
+      const startTime = Date.now();
+      const MIN_LOADING_TIME = 1000;
+      
       try {
         setLoading(true);
         const response = await getGameById(id);
         setGame(response.game);
       } catch (error) {
-        message.error('加载游戏详情失败');
+        message.error(t('gameDetail.loadFailed'));
         console.error('Error loading game detail:', error);
       } finally {
-        setLoading(false);
+        const elapsed = Date.now() - startTime;
+        const remaining = MIN_LOADING_TIME - elapsed;
+        if (remaining > 0) {
+          setTimeout(() => setLoading(false), remaining);
+        } else {
+          setLoading(false);
+        }
       }
     };
     
@@ -45,30 +58,45 @@ function GameDetailPage() {
     }
   };
 
-  const handleDownload = () => {
-    if (game?.game_file_url) {
-      window.open(game.game_file_url, '_blank');
-      message.success('开始下载...');
+  // 检查是否是 OSS URL
+  const isOssUrl = (url) => url && url.includes('oss-cn-hangzhou.aliyuncs.com');
+
+  const handleDownload = async () => {
+    if (!game?.game_file_url) return;
+    
+    setDownloading(true);
+    try {
+      let finalUrl = game.game_file_url;
+      
+      // 如果是 OSS URL，先获取签名 URL
+      if (isOssUrl(game.game_file_url)) {
+        const signedUrl = await getSignedUrl(game.game_file_url);
+        if (signedUrl) {
+          finalUrl = signedUrl;
+        }
+      }
+      
+      window.open(finalUrl, '_blank');
+      message.success(t('gameDetail.downloadStarted'));
+    } catch (error) {
+      console.error('Download error:', error);
+      message.error(t('gameDetail.downloadFailed'));
+    } finally {
+      setDownloading(false);
     }
   };
 
   if (loading) {
-    return (
-      <Layout className="game-detail-page">
-        <div className="loading-container">
-          <Spin size="large" tip="加载中..." />
-        </div>
-      </Layout>
-    );
+    return <CyberLoader text="LOADING DETAILS" />;
   }
 
   if (!game) {
     return (
       <Layout className="game-detail-page">
         <div className="error-container">
-          <h2>游戏不存在</h2>
+          <h2>{t('gameDetail.notFound')}</h2>
           <Button type="primary" onClick={() => navigate('/games')}>
-            返回游戏库
+            {t('gameDetail.backToLibrary')}
           </Button>
         </div>
       </Layout>
@@ -84,9 +112,9 @@ function GameDetailPage() {
             onClick={() => navigate('/games')}
             className="back-btn"
           >
-            返回游戏库
+            {t('gameDetail.back')}
           </Button>
-          <h1>游戏详情</h1>
+          <h1>{t('games.title')}</h1>
         </div>
       </Header>
 
@@ -119,12 +147,13 @@ function GameDetailPage() {
               <Button
                 type="primary"
                 size="large"
-                icon={<DownloadOutlined />}
+                icon={downloading ? <LoadingOutlined /> : <DownloadOutlined />}
                 onClick={handleDownload}
                 className="download-btn"
-                disabled={!game.game_file_url}
+                disabled={!game.game_file_url || downloading}
+                loading={downloading}
               >
-                立即下载
+                {t('gameDetail.download')}
               </Button>
             </div>
           </div>

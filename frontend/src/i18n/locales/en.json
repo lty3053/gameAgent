@@ -1,0 +1,176 @@
+{
+  "header": {
+    "clear": "Clear",
+    "uploadGame": "Upload Game"
+  },
+  "chat": {
+    "welcomeTitle": "How can I help you?",
+    "welcomeSubtitle": "I'm your personal game assistant. Ask me for recommendations, search for games, or manage your library.",
+    "inputPlaceholder": "Ask anything about games...",
+    "suggestions": {
+      "action": {
+        "text": "Recommend an action game",
+        "desc": "High pace, intense combat"
+      },
+      "rpg": {
+        "text": "Any new RPGs?",
+        "desc": "Story rich adventures"
+      },
+      "upload": {
+        "text": "How to upload games?",
+        "desc": "Learn about the process"
+      },
+      "capabilities": {
+        "text": "What can you do?",
+        "desc": "Discover AI capabilities"
+      }
+    },
+    "historyCleared": "Chat history cleared",
+    "clearFailed": "Failed to clear history",
+    "status": {
+      "analyzing": "Analyzing your request...",
+      "searching": "Searching game library..."
+    }
+  },
+  "login": {
+    "title": "Welcome Back",
+    "subtitle": "Sign in to continue your gaming journey",
+    "guestBtn": "Continue as Guest",
+    "guestDesc": "Quick access, no registration needed",
+    "loginBtn": "Sign In",
+    "registerBtn": "Create Account",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Password",
+    "backToChoice": "Back",
+    "loginSuccess": "Login successful!",
+    "loginFailed": "Login failed, please check your email and password",
+    "registerSuccess": "Registration successful!",
+    "registerFailed": "Registration failed",
+    "guestFailed": "Guest login failed, please try again",
+    "fillRequired": "Please enter email and password",
+    "passwordMinLength": "Password must be at least 6 characters",
+    "noAccount": "Don't have an account? Sign up",
+    "hasAccount": "Already have an account? Sign in"
+  },
+  "upload": {
+    "title": "Upload Game",
+    "sectionLabel": "Game Metadata",
+    "tabs": {
+      "file": "File Upload",
+      "netdisk": "Cloud Link"
+    },
+    "dropzone": {
+      "title": "Drop your game file here",
+      "subtitle": "or click to browse",
+      "formats": "Supports ZIP, RAR, 7Z, ISO formats"
+    },
+    "netdisk": {
+      "title": "Cloud Resource",
+      "subtitle": "Save shared links directly without re-uploading. Supports Quark, Baidu, and Aliyun Drive."
+    },
+    "form": {
+      "gameName": "Game Name",
+      "gameNameEn": "English Name (Optional)",
+      "gameNameRequired": "Game Name is required",
+      "category": "Select Game Category",
+      "shareLink": "Share Link (Permanent, No Code)",
+      "shareLinkRequired": "Link is required",
+      "totalSize": "Total Size (e.g. 15GB)",
+      "coverImage": "Cover Image (Optional)",
+      "description": "Description...",
+      "submit": "UPLOAD",
+      "submitting": "UPLOADING..."
+    },
+    "categories": {
+      "action": "Action Adventure",
+      "turn_based": "Turn-Based Strategy",
+      "wuxia": "Wuxia / Fantasy",
+      "retro": "Retro Classic",
+      "female_lead": "Female Protagonist",
+      "utility": "Utility Tools",
+      "horror": "Horror Thriller",
+      "shooter": "Shooter",
+      "fighting": "Fighting",
+      "simulation": "Simulation",
+      "puzzle": "Puzzle Casual",
+      "interactive": "Interactive Movie",
+      "racing": "Racing Sports",
+      "strategy": "Strategy",
+      "roguelike": "Roguelike",
+      "vr": "Virtual Reality (VR)",
+      "visual_novel": "Visual Novel",
+      "rpg": "Role-Playing Game"
+    },
+    "netdiskTypes": {
+      "quark": "Quark Drive",
+      "xunlei": "Xunlei Drive",
+      "baidu": "Baidu Netdisk",
+      "aliyun": "Aliyun Drive"
+    },
+    "messages": {
+      "selectFile": "Please select a file first",
+      "uploadSuccess": "Upload successful!",
+      "uploadFailed": "Upload failed"
+    },
+    "progress": {
+      "uploading": "Uploading",
+      "processing": "Processing...",
+      "complete": "Complete!"
+    }
+  },
+  "games": {
+    "title": "Game Library",
+    "search": "Search games...",
+    "searchBtn": "Search",
+    "back": "Back",
+    "empty": {
+      "title": "No Games Yet",
+      "subtitle": "No games have been uploaded yet, go upload some!",
+      "uploadBtn": "Upload Game"
+    },
+    "loadFailed": "Failed to load game list",
+    "searchFailed": "Search failed"
+  },
+  "gameDetail": {
+    "back": "Back to Library",
+    "download": "Download Game",
+    "getLink": "Get Link",
+    "notFound": "Game Not Found",
+    "backToLibrary": "Back to Library",
+    "loadFailed": "Failed to load game details",
+    "downloadStarted": "Download started...",
+    "downloadFailed": "Download failed",
+    "info": {
+      "name": "Name",
+      "description": "Description",
+      "fileSize": "File Size",
+      "storageType": "Storage Type",
+      "uploadTime": "Upload Time",
+      "noDescription": "No description available"
+    },
+    "storageTypes": {
+      "oss": "Cloud Storage",
+      "netdisk": "Network Disk"
+    }
+  },
+  "gameCard": {
+    "download": "DOWNLOAD",
+    "getLink": "GET LINK",
+    "noDescription": "No description available.",
+    "netdiskTypes": {
+      "quark": "Quark Drive",
+      "baidu": "Baidu Netdisk",
+      "aliyun": "Aliyun Drive"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit"
+  }
+}

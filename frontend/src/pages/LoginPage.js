@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { User, Mail, Lock, Sparkles, LogIn } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { createGuest, login, register } from '../api/api';
 import { setUserKey, setUserInfo } from '../utils/auth';
 import { message } from 'antd';
@@ -8,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import './LoginPage.css';
 
 function LoginPage() {
+  const { t } = useTranslation();
   const [mode, setMode] = useState('choice'); // 'choice', 'login', 'register'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,7 +25,7 @@ function LoginPage() {
       navigate('/chat');
     } catch (error) {
       console.error('Guest login failed:', error);
-      message.error('游客登录失败，请重试');
+      message.error(t('login.guestFailed'));
     } finally {
       setLoading(false);
     }
@@ -32,7 +34,7 @@ function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) {
-      message.warning('请输入邮箱和密码');
+      message.warning(t('login.fillRequired'));
       return;
     }
 
@@ -41,11 +43,11 @@ function LoginPage() {
       const response = await login(email, password);
       setUserKey(response.user.user_key);
       setUserInfo(response.user);
-      message.success('登录成功！');
+      message.success(t('login.loginSuccess'));
       navigate('/chat');
     } catch (error) {
       console.error('Login failed:', error);
-      message.error(error.response?.data?.error || '登录失败，请检查邮箱和密码');
+      message.error(error.response?.data?.error || t('login.loginFailed'));
     } finally {
       setLoading(false);
     }
@@ -54,12 +56,12 @@ function LoginPage() {
   const handleRegister = async (e) => {
     e.preventDefault();
     if (!email || !password) {
-      message.warning('请输入邮箱和密码');
+      message.warning(t('login.fillRequired'));
       return;
     }
 
     if (password.length < 6) {
-      message.warning('密码至少需要6个字符');
+      message.warning(t('login.passwordMinLength'));
       return;
     }
 
@@ -68,11 +70,11 @@ function LoginPage() {
       const response = await register(email, password);
       setUserKey(response.user.user_key);
       setUserInfo(response.user);
-      message.success('注册成功！');
+      message.success(t('login.registerSuccess'));
       navigate('/chat');
     } catch (error) {
       console.error('Register failed:', error);
-      message.error(error.response?.data?.error || '注册失败，请重试');
+      message.error(error.response?.data?.error || t('login.registerFailed'));
     } finally {
       setLoading(false);
     }
@@ -89,8 +91,8 @@ function LoginPage() {
         >
           <div className="login-header">
             <Sparkles size={48} className="login-icon" />
-            <h1 className="login-title">Game Agent</h1>
-            <p className="login-subtitle">Your Personal Game Assistant</p>
+            <h1 className="login-title">Game.Agent</h1>
+            <p className="login-subtitle">{t('login.subtitle')}</p>
           </div>
 
           <div className="login-options">
@@ -102,8 +104,8 @@ function LoginPage() {
               whileTap={{ scale: 0.98 }}
             >
               <User size={32} />
-              <h3>游客登录</h3>
-              <p>快速开始，无需注册</p>
+              <h3>{t('login.guestBtn')}</h3>
+              <p>{t('login.guestDesc')}</p>
             </motion.button>
 
             <motion.button
@@ -113,8 +115,8 @@ function LoginPage() {
               whileTap={{ scale: 0.98 }}
             >
               <LogIn size={32} />
-              <h3>账号登录</h3>
-              <p>使用邮箱登录或注册</p>
+              <h3>{t('login.loginBtn')}</h3>
+              <p>{t('login.subtitle')}</p>
             </motion.button>
           </div>
         </motion.div>
@@ -132,8 +134,8 @@ function LoginPage() {
       >
         <div className="login-header">
           <Sparkles size={48} className="login-icon" />
-          <h1 className="login-title">{mode === 'login' ? '登录' : '注册'}</h1>
-          <p className="login-subtitle">使用邮箱{mode === 'login' ? '登录' : '注册'}账号</p>
+          <h1 className="login-title">{mode === 'login' ? t('login.loginBtn') : t('login.registerBtn')}</h1>
+          <p className="login-subtitle">{t('login.subtitle')}</p>
         </div>
 
         <form onSubmit={mode === 'login' ? handleLogin : handleRegister} className="auth-form-content">
@@ -141,7 +143,7 @@ function LoginPage() {
             <Mail size={20} className="form-icon" />
             <input
               type="email"
-              placeholder="邮箱地址"
+              placeholder={t('login.emailPlaceholder')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="form-input"
@@ -153,7 +155,7 @@ function LoginPage() {
             <Lock size={20} className="form-icon" />
             <input
               type="password"
-              placeholder="密码"
+              placeholder={t('login.passwordPlaceholder')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="form-input"
@@ -162,7 +164,7 @@ function LoginPage() {
           </div>
 
           <button type="submit" className="submit-btn" disabled={loading}>
-            {loading ? '处理中...' : (mode === 'login' ? '登录' : '注册')}
+            {loading ? t('common.loading') : (mode === 'login' ? t('login.loginBtn') : t('login.registerBtn'))}
           </button>
 
           <div className="form-footer">
@@ -171,14 +173,14 @@ function LoginPage() {
               className="link-btn"
               onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
             >
-              {mode === 'login' ? '没有账号？立即注册' : '已有账号？立即登录'}
+              {mode === 'login' ? t('login.noAccount') : t('login.hasAccount')}
             </button>
             <button 
               type="button" 
               className="link-btn"
               onClick={() => setMode('choice')}
             >
-              返回
+              {t('login.backToChoice')}
             </button>
           </div>
         </form>

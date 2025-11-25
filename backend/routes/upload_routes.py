@@ -49,7 +49,7 @@ def get_progress(upload_id):
 
 @bp.route('/file', methods=['POST'])
 def upload_file():
-    """上传游戏文件到 S3（后端上传，支持轮询进度）"""
+    """上传游戏文件到 OSS（后端上传，支持轮询进度）"""
     try:
         if 'file' not in request.files:
             return jsonify({'error': 'No file provided'}), 400
@@ -60,9 +60,23 @@ def upload_file():
         
         # 获取表单数据
         game_name = request.form.get('name', file.filename)
+        name_en = request.form.get('name_en')
+        category = request.form.get('category')
         description = request.form.get('description')
         upload_id = request.form.get('upload_id', 'default')
         cover_image_file = request.files.get('cover_image')  # 封面图片
+        
+        # 检查是否已存在相同名称和存储类型的游戏
+        db = SessionLocal()
+        try:
+            existing_game = db.query(Game).filter(
+                Game.name == game_name,
+                Game.storage_type == 'oss'
+            ).first()
+            if existing_game:
+                return jsonify({'error': f'游戏《{game_name}》已存在（OSS方式），请勿重复上传'}), 400
+        finally:
+            db.close()
         
         # 初始化进度
         upload_progress_store[upload_id] = {
@@ -85,17 +99,17 @@ def upload_file():
             # 打印进度日志
             print(f"🔔 Progress: {percent}% for {upload_id}", flush=True)
         
-        # 上传到 S3
+        # 上传到 OSS
         result = storage_service.upload_file(file, 'games', progress_callback)
         
         if not result['success']:
             upload_progress_store[upload_id] = {'percent': 0, 'status': 'error', 'error': result.get('error')}
             return jsonify({'error': result.get('error', 'Upload failed')}), 500
         
-        # 如果有封面图片，也上传到 S3
+        # 如果有封面图片，也上传到 OSS images 目录
         cover_image_url = None
         if cover_image_file and cover_image_file.filename:
-            cover_result = storage_service.upload_file(cover_image_file, 'covers')
+            cover_result = storage_service.upload_file(cover_image_file, 'images')
             if cover_result['success']:
                 cover_image_url = cover_result['url']
         
@@ -107,10 +121,12 @@ def upload_file():
         try:
             game = Game(
                 name=game_name,
+                name_en=name_en,
+                category=category,
                 description=description,
                 game_file_url=result['url'],
                 cover_image_url=cover_image_url,
-                storage_type='s3',
+                storage_type='oss',
                 file_size=str(request.content_length or 0)
             )
             
@@ -150,6 +166,8 @@ def upload_netdisk():
     try:
         # 从 form data 获取数据（因为可能包含文件）
         game_name = request.form.get('name')
+        name_en = request.form.get('name_en')
+        category = request.form.get('category')
         description = request.form.get('description')
         netdisk_url = request.form.get('netdisk_url')
         netdisk_type = request.form.get('netdisk_type')
@@ -165,10 +183,22 @@ def upload_netdisk():
         if not netdisk_type:
             return jsonify({'error': '网盘类型不能为空'}), 400
         
-        # 如果有封面图片，上传到 S3
+        # 检查是否已存在相同名称和存储类型的游戏
+        db = SessionLocal()
+        try:
+            existing_game = db.query(Game).filter(
+                Game.name == game_name,
+                Game.storage_type == 'netdisk'
+            ).first()
+            if existing_game:
+                return jsonify({'error': f'游戏《{game_name}》已存在（网盘方式），请勿重复上传'}), 400
+        finally:
+            db.close()
+        
+        # 如果有封面图片，上传到 OSS images 目录
         cover_image_url = None
         if cover_image_file and cover_image_file.filename:
-            cover_result = storage_service.upload_file(cover_image_file, 'covers')
+            cover_result = storage_service.upload_file(cover_image_file, 'images')
             if cover_result['success']:
                 cover_image_url = cover_result['url']
         
@@ -183,6 +213,8 @@ def upload_netdisk():
         try:
             game = Game(
                 name=game_name,
+                name_en=name_en,
+                category=category,
                 description=description,
                 game_file_url=netdisk_url,
                 cover_image_url=cover_image_url,
@@ -270,4 +302,40 @@ def upload_video():
         
     except Exception as e:
         print(f"Error uploading video: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@bp.route('/sign-url', methods=['POST'])
+def get_signed_url():
+    """获取 OSS 文件的签名访问 URL"""
+    try:
+        data = request.json
+        url = data.get('url')
+        
+        if not url:
+            return jsonify({'error': 'URL is required'}), 400
+        
+        # 从完整 URL 中提取 key
+        # URL 格式: https://bucket.oss-cn-hangzhou.aliyuncs.com/test/images/xxx.jpg
+        # 需要提取: test/images/xxx.jpg
+        from config import Config
+        base_url = f"https://{Config.OSS_BUCKET}.oss-cn-hangzhou.aliyuncs.com/"
+        
+        if url.startswith(base_url):
+            key = url[len(base_url):]
+        else:
+            # 如果不是标准格式，尝试直接使用
+            key = url
+        
+        # 生成签名 URL（有效期 1 小时）
+        result = storage_service.generate_presigned_url(key, expiration=3600)
+        
+        if result['success']:
+            return jsonify({'signed_url': result['url']}), 200
+        else:
+            return jsonify({'error': result.get('error', 'Failed to generate signed URL')}), 500
+            
+    except Exception as e:
+        print(f"Error generating signed URL: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500

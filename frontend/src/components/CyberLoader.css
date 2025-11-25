@@ -1,0 +1,281 @@
+/* Cyber Loader - 乌托邦黑客风格 */
+
+.cyber-loader-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #0a0a0f;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+/* 背景网格 */
+.cyber-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(50px, 50px); }
+}
+
+/* 扫描线 */
+.scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(99, 102, 241, 0.5), 
+    rgba(139, 92, 246, 0.8), 
+    rgba(99, 102, 241, 0.5), 
+    transparent
+  );
+  animation: scanDown 3s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+}
+
+@keyframes scanDown {
+  0% { top: -2px; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* 主加载区域 */
+.cyber-loader-content {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 旋转环 */
+.cyber-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.cyber-ring svg {
+  width: 100%;
+  height: 100%;
+}
+
+.cyber-ring circle {
+  fill: none;
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+
+/* 外圈 */
+.cyber-ring.outer {
+  animation: rotateClockwise 8s linear infinite;
+}
+
+.cyber-ring.outer circle {
+  stroke: rgba(99, 102, 241, 0.6);
+  stroke-dasharray: 80 200;
+  filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.8));
+}
+
+/* 中圈 */
+.cyber-ring.middle {
+  animation: rotateCounterClockwise 5s linear infinite;
+}
+
+.cyber-ring.middle circle {
+  stroke: rgba(139, 92, 246, 0.5);
+  stroke-dasharray: 50 150;
+  filter: drop-shadow(0 0 4px rgba(139, 92, 246, 0.6));
+}
+
+/* 内圈 */
+.cyber-ring.inner {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.cyber-ring.inner circle {
+  stroke: rgba(99, 102, 241, 0.8);
+  stroke-dasharray: 30 100;
+  filter: drop-shadow(0 0 8px rgba(99, 102, 241, 1));
+}
+
+@keyframes rotateClockwise {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rotateCounterClockwise {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+
+/* 中心核心 */
+.cyber-core {
+  position: relative;
+  z-index: 10;
+}
+
+.core-icon {
+  font-size: 32px;
+  color: #6366f1;
+  text-shadow: 
+    0 0 10px rgba(99, 102, 241, 0.8),
+    0 0 20px rgba(99, 102, 241, 0.6),
+    0 0 40px rgba(99, 102, 241, 0.4);
+  animation: glitch 3s infinite;
+}
+
+@keyframes glitch {
+  0%, 90%, 100% { 
+    transform: translate(0); 
+    text-shadow: 
+      0 0 10px rgba(99, 102, 241, 0.8),
+      0 0 20px rgba(99, 102, 241, 0.6);
+  }
+  92% { 
+    transform: translate(-2px, 1px); 
+    text-shadow: 
+      2px 0 rgba(255, 0, 128, 0.8),
+      -2px 0 rgba(0, 255, 255, 0.8);
+  }
+  94% { 
+    transform: translate(2px, -1px); 
+    text-shadow: 
+      -2px 0 rgba(255, 0, 128, 0.8),
+      2px 0 rgba(0, 255, 255, 0.8);
+  }
+  96% { 
+    transform: translate(0); 
+  }
+}
+
+/* 文字区域 */
+.cyber-text-container {
+  margin-top: 48px;
+  text-align: center;
+}
+
+.cyber-text {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 14px;
+  letter-spacing: 4px;
+  color: #a5b4fc;
+  text-transform: uppercase;
+}
+
+.cyber-char {
+  display: inline-block;
+}
+
+.cyber-cursor {
+  animation: blink 0.8s step-end infinite;
+  color: #6366f1;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* 进度条 */
+.cyber-progress {
+  width: 200px;
+  height: 2px;
+  background: rgba(99, 102, 241, 0.2);
+  margin: 16px auto;
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.cyber-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent,
+    #6366f1,
+    #8b5cf6,
+    #6366f1,
+    transparent
+  );
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.8);
+}
+
+/* 状态指示器 */
+.cyber-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  background: #22c55e;
+  border-radius: 50%;
+  animation: statusPulse 1.5s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
+}
+
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+.status-text {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: rgba(34, 197, 94, 0.8);
+  text-transform: uppercase;
+}
+
+/* 添加一些装饰性角落 */
+.cyber-loader-container::before,
+.cyber-loader-container::after {
+  content: '';
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.cyber-loader-container::before {
+  top: 40px;
+  left: 40px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.cyber-loader-container::after {
+  bottom: 40px;
+  right: 40px;
+  border-left: none;
+  border-top: none;
+}
