@@ -19,6 +19,50 @@ export const sendMessage = async (message, userKey) => {
   return response.data;
 };
 
+export const sendStreamMessage = async (message, userKey, onChunk) => {
+  const response = await fetch(`${API_BASE_URL}/chat/stream`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      message,
+      user_key: userKey,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    
+    const chunk = decoder.decode(value, { stream: true });
+    buffer += chunk;
+    
+    const lines = buffer.split('\n\n');
+    buffer = lines.pop(); // Keep the last incomplete chunk
+    
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        const jsonStr = line.slice(6);
+        try {
+          const data = JSON.parse(jsonStr);
+          onChunk(data);
+        } catch (e) {
+          console.error('Error parsing stream chunk:', e);
+        }
+      }
+    }
+  }
+};
+
 // 用户认证 API
 export const createGuest = async () => {
   const response = await api.post('/auth/guest');

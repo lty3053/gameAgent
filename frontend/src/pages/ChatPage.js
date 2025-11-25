@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Layout, Button, Input, List, Avatar, Typography, Card, Space, Spin, message } from 'antd';
 import { User, Bot, Send, Upload, Sparkles, MessageSquare, Trash2, Gamepad2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { sendMessage, clearChatHistory, getChatHistory } from '../api/api';
+import { sendMessage, sendStreamMessage, clearChatHistory, getChatHistory } from '../api/api';
 import { useNavigate } from 'react-router-dom';
 import { getUserKey } from '../utils/auth';
 import GameCard from '../components/GameCard';
@@ -79,24 +79,55 @@ function ChatPage() {
       timestamp: new Date().toISOString(),
     };
 
+    // 添加用户消息
     setMessages((prev) => [...prev, userMessage]);
     setInputValue('');
     setLoading(true);
 
-    try {
-      const response = await sendMessage(inputValue, userKey);
-      
-      const botMessage = {
-        role: 'assistant',
-        content: response.response,
-        games: response.games || [],
-        timestamp: new Date().toISOString(),
-      };
+    // 创建一个空的 AI 消息占位
+    const botMessageId = Date.now();
+    const initialBotMessage = {
+      id: botMessageId,
+      role: 'assistant',
+      content: '',
+      games: [],
+      timestamp: new Date().toISOString(),
+      isStreaming: true
+    };
+    setMessages((prev) => [...prev, initialBotMessage]);
 
-      setMessages((prev) => [...prev, botMessage]);
+    try {
+      await sendStreamMessage(inputValue, userKey, (chunk) => {
+        setMessages((prev) => {
+          const newMessages = [...prev];
+          const msgIndex = newMessages.findIndex(m => m.id === botMessageId);
+          if (msgIndex === -1) return prev;
+
+          const msg = { ...newMessages[msgIndex] };
+
+          if (chunk.type === 'content') {
+            msg.content += chunk.data;
+            // 一旦开始接收内容，停止加载动画
+            setLoading(false);
+          } else if (chunk.type === 'games') {
+            msg.games = chunk.data;
+            setLoading(false);
+          } else if (chunk.type === 'done') {
+            msg.isStreaming = false;
+          } else if (chunk.error) {
+            message.error('Error: ' + chunk.error);
+            msg.isStreaming = false;
+          }
+
+          newMessages[msgIndex] = msg;
+          return newMessages;
+        });
+      });
     } catch (error) {
       console.error('Failed to send message:', error);
       message.error('Failed to send message. Please try again.');
+      // Remove the bot message if failed completely or mark as error
+      setMessages((prev) => prev.filter(m => m.id !== botMessageId));
     } finally {
       setLoading(false);
     }

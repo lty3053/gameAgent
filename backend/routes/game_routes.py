@@ -69,7 +69,7 @@ def create_game():
                 name_en=data.get('name_en'),
                 description=data.get('description'),
                 download_url=data.get('download_url'),
-                cover_image=data.get('cover_image'),
+                cover_image_url=data.get('cover_image_url') or data.get('cover_image'),
                 video_url=data.get('video_url'),
                 file_size=data.get('file_size'),
                 tags=data.get('tags')

@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, Response, stream_with_context
 from sqlalchemy import or_
 from database.models import Game, User, ChatHistory, SessionLocal
 from langgraph.graph import StateGraph, END
@@ -309,6 +309,121 @@ def send_message():
         print(f"❌ Error in chat: {type(e).__name__}: {str(e)}")
         import traceback
         traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+@bp.route('/stream', methods=['POST'])
+def stream_chat():
+    """流式发送消息到AI"""
+    try:
+        data = request.json
+        user_message = data.get('message', '')
+        user_key = data.get('user_key')
+        
+        if not user_message or not user_key:
+            return jsonify({'error': 'Missing required fields'}), 400
+            
+        def generate():
+            db = SessionLocal()
+            try:
+                user = db.query(User).filter(User.user_key == user_key).first()
+                if not user:
+                    yield f"data: {json.dumps({'error': 'User not found'})}\n\n"
+                    return
+
+                # 1. 加载历史
+                histories = db.query(ChatHistory)\
+                    .filter(ChatHistory.user_id == user.id)\
+                    .order_by(ChatHistory.created_at.desc())\
+                    .limit(20)\
+                    .all()
+                history = [{'role': h.role, 'content': h.content} for h in reversed(histories)]
+                
+                # 2. 构建状态并分析意图
+                initial_state = {
+                    "messages": history + [{"role": "user", "content": user_message}],
+                    "user_query": user_message,
+                    "search_results": [],
+                    "intent": "",
+                    "final_response": ""
+                }
+                
+                # 调用分析函数（复用现有的逻辑）
+                analyzed_state = analyze_and_call_tools(initial_state)
+                search_results = analyzed_state.get("search_results", [])
+                intent = analyzed_state.get("intent", "chat")
+                
+                # 如果有游戏结果，先发送
+                if search_results:
+                    yield f"data: {json.dumps({'type': 'games', 'data': search_results})}\n\n"
+                
+                # 3. 构建最终提示词
+                if intent == "search" and search_results:
+                    games_info = "\n".join([
+                        f"- {g['name']}: {g.get('description', '暂无描述')[:100]} "
+                        f"[存储方式: {'网盘(' + g.get('netdisk_type', '未知') + ')' if g.get('storage_type') == 'netdisk' else 'S3直传'}]"
+                        for g in search_results[:5]
+                    ])
+                    system_prompt = f"""你是一个专业的游戏推荐助手。用户询问："{user_message}"
+                    
+                    找到以下游戏：
+                    {games_info}
+                    
+                    请用友好、专业的语气介绍这些游戏，突出它们的特点。保持简洁，每个游戏2-3句话。
+                    如果游戏是通过网盘分享的，请在介绍时说明网盘类型。"""
+                else:
+                    system_prompt = f"""你是一个专业的游戏推荐助手。用户说："{user_message}"
+                    请友好地回应用户。如果数据库中没有相关游戏，提示他们可以通过"上传游戏"按钮添加游戏。"""
+
+                messages = [{"role": "system", "content": system_prompt}] + analyzed_state["messages"]
+                
+                # 4. 流式调用 OpenAI
+                client = get_openai_client()
+                stream = client.chat.completions.create(
+                    model=os.getenv('QWEN_MODEL', 'qwen3-max'),
+                    messages=messages,
+                    temperature=0.7,
+                    stream=True
+                )
+                
+                full_response = ""
+                for chunk in stream:
+                    if chunk.choices[0].delta.content:
+                        content = chunk.choices[0].delta.content
+                        full_response += content
+                        yield f"data: {json.dumps({'type': 'content', 'data': content})}\n\n"
+                
+                # 5. 保存到数据库
+                # 保存用户消息
+                user_history = ChatHistory(
+                    user_id=user.id,
+                    role='user',
+                    content=user_message
+                )
+                db.add(user_history)
+                
+                # 保存 AI 响应
+                assistant_history = ChatHistory(
+                    user_id=user.id,
+                    role='assistant',
+                    content=full_response
+                )
+                db.add(assistant_history)
+                db.commit()
+                
+                # 发送结束信号
+                yield f"data: {json.dumps({'type': 'done'})}\n\n"
+                
+            except Exception as e:
+                print(f"Error in stream: {e}")
+                import traceback
+                traceback.print_exc()
+                yield f"data: {json.dumps({'error': str(e)})}\n\n"
+            finally:
+                db.close()
+
+        return Response(stream_with_context(generate()), mimetype='text/event-stream')
+        
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 @bp.route('/clear', methods=['POST'])
