@@ -1,0 +1,263 @@
+/* 游戏详情页面 */
+.game-detail-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+/* 头部 */
+.detail-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 16px 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.detail-header .header-content {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.detail-header h1 {
+  color: white;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.detail-header .back-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+}
+
+.detail-header .back-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* 内容区 */
+.detail-content {
+  padding: 32px 24px;
+  min-height: calc(100vh - 64px);
+}
+
+.detail-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* 游戏英雄区 */
+.game-hero {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 32px;
+  padding: 32px;
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-cover {
+  flex: 0 0 400px;
+  height: 300px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.hero-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.default-hero-cover {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.default-hero-cover .game-icon {
+  font-size: 120px;
+  opacity: 0.8;
+}
+
+.hero-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.game-name {
+  font-size: 36px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+.game-name-en {
+  font-size: 20px;
+  font-weight: 400;
+  color: #666;
+  margin: 0 0 24px 0;
+}
+
+.game-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+.game-meta .ant-tag {
+  font-size: 14px;
+  padding: 6px 16px;
+  border-radius: 6px;
+}
+
+.download-btn {
+  width: fit-content;
+  height: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s ease;
+}
+
+.download-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+/* 详情卡片 */
+.detail-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.detail-card .ant-card-head {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8eeff 100%);
+  border-bottom: 2px solid #667eea;
+}
+
+.detail-card .ant-card-head-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* 游戏描述 */
+.game-description-full {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #333;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* 游戏视频 */
+.game-video {
+  width: 100%;
+  max-height: 600px;
+  border-radius: 8px;
+}
+
+/* 加载和错误状态 */
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  gap: 16px;
+}
+
+.error-container h2 {
+  font-size: 24px;
+  color: #333;
+}
+
+/* 响应式 */
+@media (max-width: 992px) {
+  .game-hero {
+    flex-direction: column;
+    padding: 24px;
+  }
+
+  .hero-cover {
+    flex: none;
+    width: 100%;
+    height: 250px;
+  }
+
+  .game-name {
+    font-size: 28px;
+  }
+
+  .game-name-en {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .detail-content {
+    padding: 16px;
+  }
+
+  .game-hero {
+    padding: 16px;
+  }
+
+  .hero-cover {
+    height: 200px;
+  }
+
+  .game-name {
+    font-size: 24px;
+  }
+
+  .download-btn {
+    width: 100%;
+  }
+}
