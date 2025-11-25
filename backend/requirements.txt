@@ -12,4 +12,4 @@ langchain==0.3.7
 langchain-openai==0.2.8
 langgraph==0.2.45
 httpx==0.27.2
-tiktoken==0.12.07
+tiktoken==0.8.0
